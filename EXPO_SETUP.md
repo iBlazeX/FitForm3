@@ -226,12 +226,12 @@ expo build:ios
 
 **Problem**: Metro bundler fails with error "Property 'require' doesn't exist" when running on Expo Go
 
-**Cause**: The `metro.config.js` file is using an incorrect import path for Expo's Metro configuration. In Expo SDK 50+, the correct package is `@expo/metro-config`, not `expo/metro-config`.
+**Cause**: The `metro.config.js` file is using an incorrect import path for Expo's Metro configuration. In Expo SDK 50+, the correct package is `expo/metro-config`, not `@expo/metro-config` directly.
 
 **Solution**:
 Ensure your `metro.config.js` uses the correct import:
 ```javascript
-const { getDefaultConfig } = require('@expo/metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 ```
 
 If you're still seeing this error:
