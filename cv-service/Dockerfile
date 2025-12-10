@@ -42,4 +42,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Run with gunicorn - use PORT environment variable
 # Single worker to maintain session state in memory
 # For production with multiple workers, use Redis for session storage
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 120 app:app
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 120 app:app"]

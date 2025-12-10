@@ -1,0 +1,38 @@
+# Render.com ignore file
+# Files and directories to exclude from deployment
+
+# Documentation (not needed in production)
+*.md
+!README.md
+docs/
+
+# Development files
+.git/
+.github/
+.gitignore
+.vscode/
+.idea/
+
+# Flutter mobile app (not deployed to Render)
+flutter_app/
+mobile-app/
+
+# Standalone reference code
+standalone_reference_only_not_production_code/
+
+# Test files
+**/__tests__/
+**/tests/
+*.test.js
+*.spec.js
+test/
+
+# Development dependencies
+.env.example
+docker-compose.yml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
