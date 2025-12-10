@@ -65,7 +65,13 @@ Or use placeholders for development.
 npm start
 ```
 
-This will start Metro bundler and open Expo DevTools in your browser.
+This will start Metro bundler in offline mode (to avoid network fetch errors) and open Expo DevTools in your browser.
+
+**Note**: The app is configured to run in offline mode by default to prevent "TypeError: fetch failed" errors when Expo tries to validate dependencies online. If you have internet access and want to use online mode with dependency validation, use:
+
+```bash
+npm run start:online
+```
 
 ### Run on Your Device
 
@@ -215,6 +221,23 @@ expo build:ios
 ```
 
 ## Common Issues
+
+### TypeError: fetch failed (Metro Bundler)
+
+**Problem**: Metro bundler fails to start with a fetch error
+
+**Cause**: Expo CLI tries to fetch native module versions from its API servers but fails (offline environment, firewall, or network issues)
+
+**Solution**:
+The project is now configured to run in offline mode by default:
+- Use `npm start` (includes `--offline` flag)
+- Environment variable `EXPO_OFFLINE=1` is set in `.env`
+- Metro bundler configured for offline operation
+
+If you have internet and want online mode:
+```bash
+npm run start:online
+```
 
 ### Cannot Connect to Development Server
 
