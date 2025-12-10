@@ -352,12 +352,24 @@ flutter test
 
 ## 📦 Deployment
 
+### Quick Deploy to Render.com (Recommended)
+
+Deploy all services with one click using Infrastructure as Code:
+
+1. Push your code to GitHub
+2. Connect repository to [Render.com](https://render.com)
+3. Render will automatically detect `render.yaml` and deploy all services
+4. Configure environment variables in Render dashboard
+
+**See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md) for detailed step-by-step instructions.**
+
 ### Cloud Deployment Options
 
-1. **AWS**: Deploy using ECS, EC2, or Lambda
-2. **Google Cloud**: Deploy using Cloud Run or GKE
-3. **Azure**: Deploy using App Service or AKS
-4. **Heroku**: Deploy using containers or buildpacks
+1. **Render.com**: Easy Docker deployment with free tier (recommended for quick start)
+2. **AWS**: Deploy using ECS, EC2, or Lambda
+3. **Google Cloud**: Deploy using Cloud Run or GKE
+4. **Azure**: Deploy using App Service or AKS
+5. **Heroku**: Deploy using containers or buildpacks
 
 ### Deployment Steps
 

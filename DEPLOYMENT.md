@@ -33,7 +33,132 @@ docker-compose down
 
 ## Production Deployment
 
-### 1. AWS Deployment
+### 1. Render.com Deployment (Recommended)
+
+Render.com provides easy Docker-based deployment with Infrastructure as Code support.
+
+#### Prerequisites
+- GitHub account with your repository
+- Render.com account (free tier available)
+- Firebase project with service account credentials
+
+#### Quick Deploy with render.yaml
+
+1. **Push your code to GitHub**
+   ```bash
+   git push origin main
+   ```
+
+2. **Connect Repository to Render**
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New" → "Blueprint"
+   - Connect your GitHub repository
+   - Render will automatically detect `render.yaml` and create all services
+
+3. **Configure Environment Variables**
+   
+   After deployment, set these required environment variables in Render dashboard:
+
+   **For fitform-backend:**
+   - `FIREBASE_SERVICE_ACCOUNT`: Your Firebase service account JSON (as a single-line string)
+   - `CORS_ORIGINS`: Comma-separated list of allowed origins
+     Example: `https://fitform-web-app.onrender.com,https://yourdomain.com`
+
+   **For fitform-web-app:**
+   - `REACT_APP_FIREBASE_API_KEY`: Your Firebase API key
+   - `REACT_APP_FIREBASE_AUTH_DOMAIN`: Your Firebase auth domain
+   - `REACT_APP_FIREBASE_PROJECT_ID`: Your Firebase project ID
+   - `REACT_APP_FIREBASE_STORAGE_BUCKET`: Your Firebase storage bucket
+   - `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`: Your Firebase messaging sender ID
+   - `REACT_APP_FIREBASE_APP_ID`: Your Firebase app ID
+
+4. **Deploy Services**
+   - Render will automatically build and deploy all three services:
+     - `fitform-cv-service`: Computer vision service (Python/Flask)
+     - `fitform-backend`: Backend API (Node.js/Express)
+     - `fitform-web-app`: Web application (React/Nginx)
+
+5. **Access Your Application**
+   - Web App: `https://fitform-web-app.onrender.com`
+   - Backend API: `https://fitform-backend.onrender.com`
+   - CV Service: `https://fitform-cv-service.onrender.com`
+
+#### Manual Deployment (Alternative)
+
+If you prefer to deploy services individually:
+
+1. **Deploy CV Service**
+   ```bash
+   # In Render Dashboard
+   - Click "New" → "Web Service"
+   - Connect repository
+   - Set:
+     - Name: fitform-cv-service
+     - Environment: Docker
+     - Dockerfile path: ./cv-service/Dockerfile
+     - Docker context: ./cv-service
+     - Plan: Starter (or Free)
+   - Add environment variables
+   - Click "Create Web Service"
+   ```
+
+2. **Deploy Backend**
+   ```bash
+   # In Render Dashboard
+   - Click "New" → "Web Service"
+   - Connect repository
+   - Set:
+     - Name: fitform-backend
+     - Environment: Docker
+     - Dockerfile path: ./backend/Dockerfile
+     - Docker context: ./backend
+     - Plan: Starter (or Free)
+   - Add environment variables
+   - Click "Create Web Service"
+   ```
+
+3. **Deploy Web App**
+   ```bash
+   # In Render Dashboard
+   - Click "New" → "Web Service"
+   - Connect repository
+   - Set:
+     - Name: fitform-web-app
+     - Environment: Docker
+     - Dockerfile path: ./web-app/Dockerfile
+     - Docker context: ./web-app
+     - Plan: Starter (or Free)
+   - Add environment variables
+   - Click "Create Web Service"
+   ```
+
+#### Custom Domain Setup (Optional)
+
+1. Go to service settings in Render dashboard
+2. Navigate to "Custom Domains" section
+3. Add your domain
+4. Update DNS records as instructed by Render
+5. SSL certificate will be automatically provisioned
+
+#### Monitoring and Logs
+
+- View logs in Render dashboard under "Logs" tab
+- Set up health check notifications
+- Monitor service metrics in the dashboard
+
+#### Cost Optimization
+
+- **Free Tier**: All services can run on Render's free tier with some limitations:
+  - Services spin down after 15 minutes of inactivity
+  - 750 hours/month of usage
+  - Limited resources
+
+- **Starter Tier** ($7/month per service):
+  - Always-on services
+  - Better performance
+  - Custom domains with SSL
+
+### 2. AWS Deployment
 
 #### Using AWS ECS (Elastic Container Service)
 

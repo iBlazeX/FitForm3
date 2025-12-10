@@ -1,0 +1,75 @@
+# Render.com Blueprint for FitForm Application
+# This file defines all services for automatic deployment on Render.com
+# Documentation: https://render.com/docs/infrastructure-as-code
+#
+# To deploy:
+# 1. Push this file to your repository
+# 2. Connect your repository to Render.com
+# 3. Render will automatically detect and deploy all services
+# 4. Configure environment variables in Render dashboard for sensitive data
+
+services:
+  # CV Service - Python Computer Vision Service
+  - type: web
+    name: fitform-cv-service
+    env: docker
+    dockerfilePath: ./cv-service/Dockerfile
+    dockerContext: ./cv-service
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: FLASK_DEBUG
+        value: false
+      - key: PORT
+        value: 5000
+      - key: PYTHON_VERSION
+        value: 3.11
+
+  # Backend API - Node.js with Firebase
+  - type: web
+    name: fitform-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: CV_SERVICE_URL
+        value: https://fitform-cv-service.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: NODE_ENV
+        value: production
+
+  # Web App - React with Nginx
+  - type: web
+    name: fitform-web-app
+    env: docker
+    dockerfilePath: ./web-app/Dockerfile
+    dockerContext: ./web-app
+    plan: starter
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://fitform-backend.onrender.com/api
+      - key: REACT_APP_CV_SERVICE_URL
+        value: https://fitform-cv-service.onrender.com/api
+      - key: REACT_APP_FIREBASE_API_KEY
+        sync: false
+      - key: REACT_APP_FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: REACT_APP_FIREBASE_PROJECT_ID
+        sync: false
+      - key: REACT_APP_FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: REACT_APP_FIREBASE_APP_ID
+        sync: false
