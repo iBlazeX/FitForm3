@@ -1,0 +1,191 @@
+/* History Page Styles - Catppuccin Mocha */
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.history-header h1 {
+  font-size: 1.75rem;
+  color: var(--ctp-text);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: var(--ctp-surface0);
+  border: 1px solid var(--ctp-surface2);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: var(--ctp-text);
+}
+
+.filter-btn:hover {
+  border-color: var(--ctp-mauve);
+}
+
+.filter-btn.active {
+  background: var(--ctp-mauve);
+  color: var(--ctp-crust);
+  border-color: var(--ctp-mauve);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--ctp-surface0);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--ctp-surface1);
+}
+
+.history-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.history-icon {
+  font-size: 2.5rem;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ctp-surface1);
+  border-radius: 12px;
+}
+
+.history-details {
+  flex: 1;
+}
+
+.history-details h3 {
+  font-size: 1.125rem;
+  margin-bottom: 4px;
+  color: var(--ctp-text);
+}
+
+.history-date {
+  color: var(--ctp-subtext0);
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+}
+
+.history-feedback {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.feedback-tag {
+  background: rgba(203, 166, 247, 0.15);
+  color: var(--ctp-mauve);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(203, 166, 247, 0.3);
+}
+
+.history-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.history-stats .stat {
+  text-align: center;
+}
+
+.history-stats .value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ctp-mauve);
+}
+
+.history-stats .label {
+  font-size: 0.75rem;
+  color: var(--ctp-subtext0);
+  text-transform: uppercase;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  padding: 8px;
+  color: var(--ctp-text);
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  color: var(--ctp-red);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 32px;
+  padding: 20px 0;
+}
+
+.pagination-info {
+  color: var(--ctp-subtext0);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .history-details {
+    order: -1;
+  }
+
+  .history-stats {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .history-card {
+    position: relative;
+  }
+}

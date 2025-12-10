@@ -1,0 +1,63 @@
+/* Profile Page Styles - Catppuccin Mocha */
+
+.profile-page {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.profile-page h1 {
+  font-size: 1.75rem;
+  margin-bottom: 8px;
+  color: var(--ctp-text);
+}
+
+.profile-subtitle {
+  color: var(--ctp-subtext0);
+  margin-bottom: 32px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-form .card {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.goal-tips {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--ctp-surface1);
+  border-radius: 8px;
+}
+
+.goal-tips h4 {
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: var(--ctp-subtext1);
+}
+
+.goal-tips p {
+  color: var(--ctp-subtext0);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.goal-tips p.muted {
+  font-style: italic;
+  color: var(--ctp-overlay0);
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

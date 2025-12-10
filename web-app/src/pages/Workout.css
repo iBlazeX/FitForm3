@@ -1,0 +1,308 @@
+/* Workout Page Styles - Catppuccin Mocha */
+
+.workout-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.exercise-selector {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.exercise-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  background: var(--ctp-surface0);
+  border: 2px solid var(--ctp-surface2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exercise-btn:hover:not(:disabled) {
+  border-color: var(--ctp-mauve);
+}
+
+.exercise-btn.active {
+  border-color: var(--ctp-mauve);
+  background: var(--ctp-surface1);
+}
+
+.exercise-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.exercise-icon {
+  font-size: 2rem;
+}
+
+.exercise-name {
+  font-weight: 500;
+  color: var(--ctp-text);
+}
+
+.workout-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.camera-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.camera-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ctp-crust);
+  aspect-ratio: 4/3;
+  border: 1px solid var(--ctp-surface1);
+}
+
+.camera-feed-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.camera-feed.annotated {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 8px;
+  background: var(--ctp-surface0);
+  border-radius: 8px;
+}
+
+.view-toggle span {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--ctp-subtext0);
+  transition: all 0.2s;
+}
+
+.view-toggle span.active {
+  background: var(--ctp-mauve);
+  color: var(--ctp-crust);
+  font-weight: 500;
+}
+
+.annotated-view {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.annotated-label {
+  font-size: 14px;
+  color: var(--ctp-subtext0);
+  margin-bottom: 6px;
+}
+
+.annotated-img {
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid var(--ctp-surface2);
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.overlay-stat {
+  background: rgba(17, 17, 27, 0.85);
+  color: var(--ctp-text);
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--ctp-surface1);
+}
+
+.overlay-stat.debug {
+  background: rgba(17, 17, 27, 0.7);
+  min-width: 80px;
+}
+
+.overlay-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ctp-mauve);
+}
+
+.overlay-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ctp-subtext0);
+}
+
+.status-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(17, 17, 27, 0.85);
+  color: var(--ctp-overlay0);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--ctp-surface1);
+}
+
+.status-indicator.active {
+  color: var(--ctp-red);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.stats-panel {
+  background: var(--ctp-surface0);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--ctp-surface1);
+}
+
+.stats-panel h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1.5rem;
+  color: var(--ctp-text);
+}
+
+.workout-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.workout-stat {
+  text-align: center;
+  padding: 16px;
+  background: var(--ctp-surface1);
+  border-radius: 8px;
+}
+
+.workout-stat .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ctp-mauve);
+}
+
+.workout-stat .stat-value.large {
+  font-size: 2.5rem;
+}
+
+.workout-stat .stat-label {
+  font-size: 0.75rem;
+  color: var(--ctp-subtext0);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.feedback-section {
+  margin-bottom: 24px;
+}
+
+.feedback-section h4 {
+  margin-bottom: 12px;
+  color: var(--ctp-subtext1);
+}
+
+.feedback-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feedback-list li {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.feedback-list li.good {
+  background: rgba(166, 227, 161, 0.15);
+  color: var(--ctp-green);
+  border: 1px solid rgba(166, 227, 161, 0.3);
+}
+
+.feedback-list li.warning {
+  background: rgba(249, 226, 175, 0.15);
+  color: var(--ctp-yellow);
+  border: 1px solid rgba(249, 226, 175, 0.3);
+}
+
+.no-feedback {
+  color: var(--ctp-overlay0);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 20px;
+}
+
+.workout-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-large {
+  padding: 16px 24px;
+  font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+  .workout-content {
+    grid-template-columns: 1fr;
+  }
+
+  .exercise-selector {
+    flex-wrap: wrap;
+  }
+
+  .exercise-btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}

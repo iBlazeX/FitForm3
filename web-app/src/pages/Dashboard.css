@@ -1,0 +1,215 @@
+/* Dashboard Styles - Catppuccin Mocha */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 1.75rem;
+  margin-bottom: 5px;
+  color: var(--ctp-text);
+}
+
+.dashboard-header p {
+  color: var(--ctp-subtext0);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.empty-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--ctp-overlay0);
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-header-flex .card-title {
+  margin-bottom: 0;
+}
+
+.workout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workout-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ctp-surface1);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.workout-item:hover {
+  background: var(--ctp-surface2);
+}
+
+.workout-icon {
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ctp-surface0);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.workout-info {
+  flex: 1;
+}
+
+.workout-name {
+  font-weight: 600;
+  color: var(--ctp-text);
+}
+
+.workout-date {
+  font-size: 0.875rem;
+  color: var(--ctp-subtext0);
+}
+
+.workout-stats {
+  display: flex;
+  gap: 16px;
+  text-align: right;
+}
+
+.workout-stats .reps {
+  font-weight: 600;
+  color: var(--ctp-mauve);
+}
+
+.workout-stats .calories {
+  color: var(--ctp-green);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state p {
+  color: var(--ctp-subtext0);
+  margin-bottom: 16px;
+}
+
+/* Goals Card */
+.goals-card {
+  margin-bottom: 24px;
+}
+
+.goals-card.empty-goals {
+  text-align: center;
+  padding: 24px;
+}
+
+.goals-card.empty-goals p {
+  color: var(--ctp-subtext0);
+  margin: 0;
+}
+
+.goals-card.empty-goals a {
+  color: var(--ctp-mauve);
+  font-weight: 500;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.goal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goal-label {
+  font-weight: 500;
+  color: var(--ctp-text);
+}
+
+.goal-value {
+  font-size: 0.875rem;
+  color: var(--ctp-subtext0);
+}
+
+.progress-bar {
+  height: 12px;
+  background: var(--ctp-surface1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.progress-fill.calories {
+  background: linear-gradient(90deg, var(--ctp-peach), var(--ctp-red));
+}
+
+.progress-fill.reps {
+  background: linear-gradient(90deg, var(--ctp-mauve), var(--ctp-pink));
+}
+
+.progress-fill.workouts {
+  background: linear-gradient(90deg, var(--ctp-green), var(--ctp-teal));
+}
+
+.goal-percent {
+  font-size: 0.75rem;
+  color: var(--ctp-subtext0);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-stats {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .goals-grid {
+    grid-template-columns: 1fr;
+  }
+}
