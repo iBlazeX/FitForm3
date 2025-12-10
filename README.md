@@ -9,7 +9,7 @@ The platform consists of four main components:
 1. **Python CV/AI Service** - Computer vision service using MediaPipe and OpenCV for exercise detection
 2. **Node.js Backend API** - REST API for user management, authentication, and workout data (Firebase-powered)
 3. **React Web App** - Web-based user interface
-4. **Expo React Native App** - Cross-platform mobile application (iOS, Android, Web)
+4. **Flutter Mobile App** - Native cross-platform mobile application (iOS & Android) with Firebase integration
 
 ## ✨ Features
 
@@ -30,7 +30,7 @@ The platform consists of four main components:
 - Node.js >= 16 (for local development)
 - Python 3.9+ (for local development)
 - Firebase project with Authentication and Firestore enabled
-- Expo CLI (for mobile app: `npm install -g expo-cli`)
+- Flutter SDK 3.0.0+ (for mobile app development)
 
 ### Firebase Setup
 
@@ -95,20 +95,22 @@ npm start
 # App runs on http://localhost:3001
 ```
 
-#### 4. Expo React Native App
+#### 4. Flutter Mobile App
 
 ```bash
-cd mobile-app
-npm install
-# Copy and configure environment variables
-cp .env.example .env
-# Edit .env with your Firebase config and API URLs
-# IMPORTANT: For physical devices, replace localhost with your computer's IP address
-npm start
-# Scan QR code with Expo Go app or press 'a' for Android, 'i' for iOS
+cd flutter_app
+flutter pub get
+# Configure Firebase using FlutterFire CLI (recommended)
+flutterfire configure
+# Or manually configure Firebase (see flutter_app/README.md)
+# Edit lib/services/api_service.dart with your API URLs
+flutter run
+# Or build for specific platform
+flutter build apk   # Android
+flutter build ios   # iOS
 ```
 
-**Note**: See [mobile-app/README.md](mobile-app/README.md) for detailed setup instructions, especially regarding network configuration for physical devices.
+**Note**: See [flutter_app/README.md](flutter_app/README.md) for detailed setup instructions, including Firebase configuration and network setup for emulators/simulators.
 
 ## 📁 Project Structure
 
@@ -138,13 +140,22 @@ FitForm/
 │   │   └── contexts/           # React contexts
 │   ├── package.json
 │   └── Dockerfile
-├── mobile-app/           # Expo React Native App
-│   ├── src/
-│   │   ├── screens/            # Screen components
-│   │   ├── services/           # Firebase & API services
-│   │   └── config/             # Firebase configuration
-│   ├── app.json                # Expo configuration
-│   ├── package.json
+├── flutter_app/          # Flutter Mobile Application
+│   ├── lib/
+│   │   ├── config/             # Firebase configuration
+│   │   ├── models/             # Data models
+│   │   ├── screens/            # Screen widgets
+│   │   │   ├── auth/          # Login & Registration
+│   │   │   ├── home/          # Dashboard
+│   │   │   ├── workout/       # Workout screen
+│   │   │   ├── history/       # Workout history
+│   │   │   └── profile/       # User profile
+│   │   ├── services/           # Business logic
+│   │   ├── widgets/            # Reusable widgets
+│   │   └── main.dart          # App entry point
+│   ├── android/               # Android configuration
+│   ├── ios/                   # iOS configuration
+│   ├── pubspec.yaml           # Dependencies
 │   └── README.md
 └── docker-compose.yml    # Docker Compose configuration
 ```
@@ -305,25 +316,19 @@ REACT_APP_CV_SERVICE_URL=http://localhost:5000/api
 # Add Firebase web config if using direct Firebase connection
 ```
 
-### Mobile App (.env)
-```bash
-# API Configuration (use your computer's IP for physical devices)
-API_URL=http://YOUR_IP_ADDRESS:3000/api
-CV_SERVICE_URL=http://YOUR_IP_ADDRESS:5000/api
+### Flutter Mobile App
 
-# Firebase Configuration (from Firebase Console)
-FIREBASE_API_KEY=YOUR_API_KEY
-FIREBASE_AUTH_DOMAIN=YOUR_PROJECT_ID.firebaseapp.com
-FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
-FIREBASE_STORAGE_BUCKET=YOUR_PROJECT_ID.appspot.com
-FIREBASE_MESSAGING_SENDER_ID=YOUR_MESSAGING_SENDER_ID
-FIREBASE_APP_ID=YOUR_APP_ID
-```
+The Flutter app uses Firebase configuration through `lib/config/firebase_options.dart`.
 
-**Important for Mobile App**: 
-- Use your computer's local IP address (e.g., `192.168.1.100`) instead of `localhost` when testing on physical devices
-- For Android Emulator, use `10.0.2.2` instead of `localhost`
-- See [mobile-app/README.md](mobile-app/README.md) for detailed setup instructions
+**Configuration Steps:**
+1. Run `flutterfire configure` (recommended) - automatically sets up Firebase
+2. Or manually configure Firebase by editing `lib/config/firebase_options.dart`
+3. Update API URLs in `lib/services/api_service.dart`:
+   - For Android Emulator: use `http://10.0.2.2:3000/api`
+   - For iOS Simulator: use `http://localhost:3000/api` or your local IP
+   - For physical devices: use your computer's IP address
+
+See [flutter_app/README.md](flutter_app/README.md) for detailed instructions.
 
 ## 🧪 Testing
 
@@ -339,6 +344,10 @@ pytest
 # Web App tests
 cd web-app
 npm test
+
+# Flutter App tests
+cd flutter_app
+flutter test
 ```
 
 ## 📦 Deployment
@@ -366,7 +375,7 @@ npm test
 - **Database**: Firebase Firestore (NoSQL)
 - **Authentication**: Firebase Authentication
 - **CV/AI**: Python, Flask, MediaPipe, OpenCV, NumPy
-- **Mobile**: Expo, React Native
+- **Mobile**: Flutter, Dart
 - **Containerization**: Docker, Docker Compose
 - **Web Server**: Nginx
 
@@ -386,6 +395,6 @@ This project is licensed under the MIT License.
 
 - MediaPipe for pose detection
 - OpenCV for computer vision
-- React and React Native communities
+- React and Flutter communities
 - Firebase for authentication and database
-- Expo for simplified React Native development
+- Flutter team for the amazing framework
