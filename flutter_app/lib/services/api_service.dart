@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -37,7 +38,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error getting user profile: $e');
+      developer.log('Error getting user profile', error: e, name: 'ApiService');
       return null;
     }
   }
@@ -52,7 +53,7 @@ class ApiService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error updating user profile: $e');
+      developer.log('Error updating user profile', error: e, name: 'ApiService');
       return false;
     }
   }
@@ -68,7 +69,7 @@ class ApiService {
 
       return response.statusCode == 201;
     } catch (e) {
-      print('Error saving workout: $e');
+      developer.log('Error saving workout', error: e, name: 'ApiService');
       return false;
     }
   }
@@ -92,7 +93,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error getting workout history: $e');
+      developer.log('Error getting workout history', error: e, name: 'ApiService');
       return [];
     }
   }
@@ -109,7 +110,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error getting workout stats: $e');
+      developer.log('Error getting workout stats', error: e, name: 'ApiService');
       return null;
     }
   }
@@ -123,7 +124,7 @@ class ApiService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error deleting workout: $e');
+      developer.log('Error deleting workout', error: e, name: 'ApiService');
       return false;
     }
   }
@@ -148,7 +149,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error detecting exercise: $e');
+      developer.log('Error detecting exercise', error: e, name: 'ApiService');
       return null;
     }
   }
@@ -163,7 +164,7 @@ class ApiService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error resetting counter: $e');
+      developer.log('Error resetting counter', error: e, name: 'ApiService');
       return false;
     }
   }
@@ -180,7 +181,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error getting supported exercises: $e');
+      developer.log('Error getting supported exercises', error: e, name: 'ApiService');
       return [];
     }
   }
