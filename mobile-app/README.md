@@ -184,6 +184,23 @@ To enable camera features in the future:
 
 ## Troubleshooting
 
+### "Property 'require' doesn't exist" on Expo Go
+
+**Problem**: Metro bundler throws "Property 'require' doesn't exist" error when running on Expo Go
+
+**Solution**:
+This error occurs when React Native's new architecture is enabled (`newArchEnabled: true` in `app.json`). The new architecture is not yet fully stable with Expo Go and React Native 0.81.5.
+
+The app is now configured with the new architecture disabled:
+- `newArchEnabled` is set to `false` in `app.json`
+- This ensures compatibility with Expo Go
+- The app works on both web and mobile platforms
+
+If you need to enable the new architecture for testing:
+1. Set `"newArchEnabled": true` in `app.json`
+2. Note that this may cause issues with Expo Go
+3. Consider using EAS Build for production apps with the new architecture
+
 ### "TypeError: fetch failed" when starting Metro Bundler
 
 **Problem**: Expo CLI fails to start with a fetch error when trying to validate dependencies
