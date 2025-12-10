@@ -35,9 +35,9 @@ WORKDIR /app/src
 # Expose port
 EXPOSE 5000
 
-# Health check - use environment variable PORT
+# Health check - use shell form to expand environment variable
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
+    CMD sh -c 'curl -f http://localhost:${PORT:-5000}/health || exit 1'
 
 # Run with gunicorn - use PORT environment variable
 # Single worker to maintain session state in memory

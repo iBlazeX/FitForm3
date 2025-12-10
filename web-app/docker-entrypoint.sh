@@ -1,6 +1,8 @@
 #!/bin/sh
 # Startup script for nginx with dynamic port configuration
-# This script replaces the PORT placeholder in nginx config with actual PORT env var
+# This script configures nginx to listen on the PORT environment variable
+# Note: For Render.com deployment, API calls go directly to backend service URLs
+# (configured via REACT_APP_API_URL), not through nginx proxy
 
 set -e
 
@@ -20,7 +22,7 @@ server {
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
     gzip_min_length 1000;
 
-    # Handle React Router
+    # Handle React Router - serve index.html for all routes
     location / {
         try_files \$uri \$uri/ /index.html;
     }

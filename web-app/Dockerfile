@@ -54,9 +54,9 @@ EXPOSE 80
 # Set default PORT
 ENV PORT=80
 
-# Health check - use environment variable PORT
+# Health check - use shell form to expand environment variable
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
+    CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1'
 
 # Use custom entrypoint script
 ENTRYPOINT ["/docker-entrypoint.sh"]
