@@ -14,13 +14,13 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,75 +30,66 @@ export default function LoginScreen({ navigation }) {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
+      // Navigation is handled by auth state change
     } catch (error) {
-      let message = 'Login failed. Please try again.';
-      if (error.code === 'auth/user-not-found') {
-        message = 'No account found with this email.';
-      } else if (error.code === 'auth/wrong-password') {
-        message = 'Incorrect password.';
-      } else if (error.code === 'auth/invalid-email') {
-        message = 'Invalid email address.';
-      }
-      Alert.alert('Login Error', message);
+      console.error('Login error:', error);
+      Alert.alert('Error', error.message || 'Failed to login');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <View style={styles.header}>
-        <Text style={styles.logo}>💪 FitForm</Text>
-        <Text style={styles.subtitle}>AI-Powered Fitness</Text>
-      </View>
+      <View style={styles.content}>
+        <Text style={styles.title}>💪 FitForm</Text>
+        <Text style={styles.subtitle}>AI-Powered Fitness Platform</Text>
 
-      <View style={styles.form}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.description}>Sign in to continue your fitness journey</Text>
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#9CA3AF"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#9CA3AF"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.linkButton}
-          onPress={() => navigation.navigate('Register')}
-        >
-          <Text style={styles.linkText}>
-            Don't have an account? <Text style={styles.linkBold}>Sign up</Text>
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Register')}
+            style={styles.linkButton}
+          >
+            <Text style={styles.linkText}>
+              Don't have an account? Register
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -107,70 +98,58 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#f5f5f5',
   },
-  header: {
-    alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 40
-  },
-  logo: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#4F46E5'
-  },
-  subtitle: {
-    color: '#6B7280',
-    marginTop: 5
-  },
-  form: {
+  content: {
     flex: 1,
-    paddingHorizontal: 24
+    justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 48,
     fontWeight: 'bold',
-    color: '#1F2937',
-    textAlign: 'center'
-  },
-  description: {
-    color: '#6B7280',
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 32
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 40,
+  },
+  form: {
+    width: '100%',
   },
   input: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
     fontSize: 16,
-    marginBottom: 16,
-    color: '#1F2937'
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   button: {
-    backgroundColor: '#4F46E5',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8
+    marginTop: 10,
   },
   buttonDisabled: {
-    opacity: 0.7
+    backgroundColor: '#999',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   linkButton: {
-    marginTop: 24,
-    alignItems: 'center'
+    marginTop: 20,
+    alignItems: 'center',
   },
   linkText: {
-    color: '#6B7280'
+    color: '#007AFF',
+    fontSize: 14,
   },
-  linkBold: {
-    color: '#4F46E5',
-    fontWeight: '600'
-  }
 });

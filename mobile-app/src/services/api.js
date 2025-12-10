@@ -1,18 +1,20 @@
 /**
- * API Service for Mobile App
+ * API Service
+ * Handles all API communications
  */
 
 import axios from 'axios';
 import { auth } from '../config/firebase';
-import { API_URL, CV_SERVICE_URL } from '../config/firebase';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+const CV_SERVICE_URL = process.env.EXPO_PUBLIC_CV_SERVICE_URL || 'http://localhost:5000/api';
 
 // Create axios instance for backend API
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
-  },
-  timeout: 30000
+  }
 });
 
 // Add auth token to requests
@@ -29,17 +31,21 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// CV Service API (separate instance)
+// CV Service API (separate instance without auth)
 const cvApi = axios.create({
   baseURL: CV_SERVICE_URL,
   headers: {
     'Content-Type': 'application/json'
-  },
-  timeout: 30000
+  }
 });
 
 // Auth API
 export const authAPI = {
+  register: async (email, password, username) => {
+    const response = await api.post('/auth/register', { email, password, username });
+    return response.data;
+  },
+  
   getProfile: async () => {
     const response = await api.get('/auth/profile');
     return response.data;
@@ -47,6 +53,11 @@ export const authAPI = {
   
   updateProfile: async (profileData) => {
     const response = await api.put('/auth/profile', profileData);
+    return response.data;
+  },
+  
+  verifyToken: async () => {
+    const response = await api.post('/auth/verify-token');
     return response.data;
   }
 };
@@ -76,11 +87,12 @@ export const workoutAPI = {
 
 // CV Service API
 export const cvAPI = {
-  detect: async (imageData, exerciseType, sessionId = 'default') => {
+  detect: async (imageData, exerciseType, sessionId = 'default', returnImage = true) => {
     const response = await cvApi.post('/detect', {
       image: imageData,
       exercise_type: exerciseType,
-      session_id: sessionId
+      session_id: sessionId,
+      return_image: returnImage
     });
     return response.data;
   },
@@ -88,6 +100,13 @@ export const cvAPI = {
   reset: async (exerciseType, sessionId = 'default') => {
     const response = await cvApi.post('/reset', {
       exercise_type: exerciseType,
+      session_id: sessionId
+    });
+    return response.data;
+  },
+  
+  cleanup: async (sessionId) => {
+    const response = await cvApi.post('/cleanup', {
       session_id: sessionId
     });
     return response.data;

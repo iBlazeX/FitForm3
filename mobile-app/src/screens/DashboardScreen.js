@@ -2,19 +2,21 @@
  * Dashboard Screen
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
   RefreshControl,
-  TouchableOpacity
+  Alert
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../contexts/AuthContext';
 import { workoutAPI } from '../services/api';
 
-export default function DashboardScreen({ navigation }) {
+export default function DashboardScreen() {
+  const { profile } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -25,17 +27,16 @@ export default function DashboardScreen({ navigation }) {
       setStats(data);
     } catch (error) {
       console.error('Error fetching stats:', error);
+      Alert.alert('Error', 'Failed to load statistics');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchStats();
-    }, [])
-  );
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -45,105 +46,77 @@ export default function DashboardScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
   return (
-    <ScrollView
+    <ScrollView 
       style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {/* Stats Cards */}
-      <View style={styles.statsGrid}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{stats?.totalWorkouts || 0}</Text>
-          <Text style={styles.statLabel}>Workouts</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{stats?.totalReps || 0}</Text>
-          <Text style={styles.statLabel}>Total Reps</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{(stats?.totalCalories || 0).toFixed(0)}</Text>
-          <Text style={styles.statLabel}>Calories</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{Math.floor((stats?.totalDuration || 0) / 60)}</Text>
-          <Text style={styles.statLabel}>Minutes</Text>
+      <View style={styles.header}>
+        <Text style={styles.greeting}>Hello, {profile?.username || 'User'}! 👋</Text>
+        <Text style={styles.subGreeting}>Ready to get fit?</Text>
+      </View>
+
+      <View style={styles.statsContainer}>
+        <Text style={styles.sectionTitle}>Your Statistics</Text>
+        
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats?.totalWorkouts || 0}</Text>
+            <Text style={styles.statLabel}>Total Workouts</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats?.totalReps || 0}</Text>
+            <Text style={styles.statLabel}>Total Reps</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>
+              {Math.round(stats?.totalCalories || 0)}
+            </Text>
+            <Text style={styles.statLabel}>Calories Burned</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>
+              {Math.round((stats?.totalDuration || 0) / 60)}
+            </Text>
+            <Text style={styles.statLabel}>Minutes Active</Text>
+          </View>
         </View>
       </View>
 
-      {/* Quick Start */}
-      <TouchableOpacity
-        style={styles.startButton}
-        onPress={() => navigation.navigate('Workout')}
-      >
-        <Text style={styles.startButtonText}>💪 Start Workout</Text>
-      </TouchableOpacity>
-
-      {/* Exercise Stats */}
-      <View style={styles.section}>
+      <View style={styles.exerciseStats}>
         <Text style={styles.sectionTitle}>Exercise Breakdown</Text>
         
-        <View style={styles.exerciseCard}>
-          <Text style={styles.exerciseIcon}>💪</Text>
-          <View style={styles.exerciseInfo}>
-            <Text style={styles.exerciseName}>Push-ups</Text>
-            <Text style={styles.exerciseStats}>
-              {stats?.byExercise?.pushup?.reps || 0} reps • {stats?.byExercise?.pushup?.count || 0} sessions
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.exerciseCard}>
-          <Text style={styles.exerciseIcon}>🦵</Text>
-          <View style={styles.exerciseInfo}>
-            <Text style={styles.exerciseName}>Squats</Text>
-            <Text style={styles.exerciseStats}>
-              {stats?.byExercise?.squat?.reps || 0} reps • {stats?.byExercise?.squat?.count || 0} sessions
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.exerciseCard}>
-          <Text style={styles.exerciseIcon}>🏋️</Text>
-          <View style={styles.exerciseInfo}>
-            <Text style={styles.exerciseName}>Sit-ups</Text>
-            <Text style={styles.exerciseStats}>
-              {stats?.byExercise?.situp?.reps || 0} reps • {stats?.byExercise?.situp?.count || 0} sessions
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Recent Workouts */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recent Workouts</Text>
-        
-        {stats?.recentWorkouts?.length > 0 ? (
-          stats.recentWorkouts.slice(0, 3).map((workout, index) => (
-            <View key={index} style={styles.recentCard}>
-              <Text style={styles.recentIcon}>
-                {workout.exerciseType === 'pushup' ? '💪' : 
-                 workout.exerciseType === 'squat' ? '🦵' : '🏋️'}
+        {stats?.exerciseBreakdown && Object.keys(stats.exerciseBreakdown).length > 0 ? (
+          Object.entries(stats.exerciseBreakdown).map(([exercise, data]) => (
+            <View key={exercise} style={styles.exerciseCard}>
+              <Text style={styles.exerciseName}>
+                {exercise.charAt(0).toUpperCase() + exercise.slice(1)}
               </Text>
-              <View style={styles.recentInfo}>
-                <Text style={styles.recentName}>
-                  {workout.exerciseType.charAt(0).toUpperCase() + workout.exerciseType.slice(1)}s
+              <View style={styles.exerciseDetails}>
+                <Text style={styles.exerciseDetailText}>
+                  {data.count} workouts
                 </Text>
-                <Text style={styles.recentDate}>
-                  {new Date(workout.date).toLocaleDateString()}
+                <Text style={styles.exerciseDetailText}>
+                  {data.totalReps} reps
+                </Text>
+                <Text style={styles.exerciseDetailText}>
+                  {Math.round(data.totalCalories)} cal
                 </Text>
               </View>
-              <Text style={styles.recentReps}>{workout.reps} reps</Text>
             </View>
           ))
         ) : (
-          <Text style={styles.emptyText}>No workouts yet. Start your first one!</Text>
+          <Text style={styles.emptyText}>No workout data yet. Start your first workout!</Text>
         )}
       </View>
     </ScrollView>
@@ -153,116 +126,97 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6'
+    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  greeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  subGreeting: {
+    fontSize: 16,
+    color: '#666',
+  },
+  statsContainer: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 16,
-    gap: 12
+    justifyContent: 'space-between',
   },
   statCard: {
-    flex: 1,
-    minWidth: '45%',
     backgroundColor: '#fff',
+    padding: 20,
     borderRadius: 12,
-    padding: 16,
-    alignItems: 'center'
+    width: '48%',
+    marginBottom: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   statValue: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#4F46E5'
+    color: '#007AFF',
+    marginBottom: 5,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-    textTransform: 'uppercase'
-  },
-  startButton: {
-    backgroundColor: '#4F46E5',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center'
-  },
-  startButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600'
-  },
-  section: {
-    padding: 16
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#1F2937'
-  },
-  exerciseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8
-  },
-  exerciseIcon: {
-    fontSize: 32,
-    marginRight: 16
-  },
-  exerciseInfo: {
-    flex: 1
-  },
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1F2937'
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
   },
   exerciseStats: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2
+    padding: 20,
   },
-  recentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  exerciseCard: {
     backgroundColor: '#fff',
+    padding: 15,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 8
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  recentIcon: {
-    fontSize: 24,
-    marginRight: 12
+  exerciseName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  recentInfo: {
-    flex: 1
+  exerciseDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  recentName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1F2937'
-  },
-  recentDate: {
-    fontSize: 12,
-    color: '#6B7280'
-  },
-  recentReps: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4F46E5'
+  exerciseDetailText: {
+    fontSize: 14,
+    color: '#666',
   },
   emptyText: {
     textAlign: 'center',
-    color: '#6B7280',
-    padding: 20
-  }
+    color: '#999',
+    fontSize: 16,
+    marginTop: 20,
+  },
 });

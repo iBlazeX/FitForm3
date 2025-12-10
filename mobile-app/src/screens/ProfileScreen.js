@@ -2,89 +2,62 @@
  * Profile Screen
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  ScrollView,
   TextInput,
+  StyleSheet,
   TouchableOpacity,
-  Alert
+  ScrollView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProfileScreen() {
-  const [profile, setProfile] = useState({
-    username: '',
-    email: auth.currentUser?.email || '',
-    age: '',
-    weight: '',
-    height: '',
-    gender: '',
-    fitnessGoal: ''
+  const { user, profile, updateProfile, logout } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    username: profile?.username || '',
+    weight: profile?.weight?.toString() || '',
+    height: profile?.height?.toString() || '',
+    age: profile?.age?.toString() || '',
+    fitnessGoal: profile?.fitnessGoal || ''
   });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const handleSave = async () => {
+    setLoading(true);
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        setProfile({
-          username: data.username || '',
-          email: user.email || '',
-          age: data.profile?.age?.toString() || '',
-          weight: data.profile?.weight?.toString() || '',
-          height: data.profile?.height?.toString() || '',
-          gender: data.profile?.gender || '',
-          fitnessGoal: data.profile?.fitnessGoal || ''
-        });
-      }
+      const updatedData = {
+        username: formData.username,
+        weight: formData.weight ? parseFloat(formData.weight) : undefined,
+        height: formData.height ? parseFloat(formData.height) : undefined,
+        age: formData.age ? parseInt(formData.age) : undefined,
+        fitnessGoal: formData.fitnessGoal
+      };
+
+      await updateProfile(updatedData);
+      setEditing(false);
+      Alert.alert('Success', 'Profile updated successfully');
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to update profile');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-      Alert.alert('Error', 'Not logged in');
-      return;
-    }
-    setSaving(true);
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        username: profile.username,
-        profile: {
-          age: profile.age ? parseInt(profile.age) : null,
-          weight: profile.weight ? parseFloat(profile.weight) : null,
-          height: profile.height ? parseFloat(profile.height) : null,
-          gender: profile.gender || null,
-          fitnessGoal: profile.fitnessGoal || null
-        }
-      }, { merge: true });
-      Alert.alert('Success', 'Profile updated successfully!');
-    } catch (error) {
-      console.error('Save error:', error);
-      Alert.alert('Error', 'Failed to save profile. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+  const handleCancel = () => {
+    setFormData({
+      username: profile?.username || '',
+      weight: profile?.weight?.toString() || '',
+      height: profile?.height?.toString() || '',
+      age: profile?.age?.toString() || '',
+      fitnessGoal: profile?.fitnessGoal || ''
+    });
+    setEditing(false);
   };
 
   const handleLogout = () => {
@@ -96,128 +69,112 @@ export default function ProfileScreen() {
         {
           text: 'Logout',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await signOut(auth);
-            } catch (error) {
-              console.error('Logout error:', error);
-            }
-          }
+          onPress: () => logout()
         }
       ]
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.avatar}>
+        <View style={styles.avatarContainer}>
           <Text style={styles.avatarText}>
-            {profile.username ? profile.username[0].toUpperCase() : '?'}
+            {profile?.username?.charAt(0).toUpperCase() || 'U'}
           </Text>
         </View>
-        <Text style={styles.email}>{profile.email}</Text>
+        <Text style={styles.email}>{user?.email}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Personal Information</Text>
-        
-        <View style={styles.inputGroup}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          {!editing && (
+            <TouchableOpacity onPress={() => setEditing(true)}>
+              <Text style={styles.editButton}>Edit</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={styles.form}>
           <Text style={styles.label}>Username</Text>
           <TextInput
-            style={styles.input}
-            value={profile.username}
-            onChangeText={(text) => setProfile({...profile, username: text})}
-            placeholder="Enter username"
-            placeholderTextColor="#9CA3AF"
+            style={[styles.input, !editing && styles.inputDisabled]}
+            value={formData.username}
+            onChangeText={(text) => setFormData({ ...formData, username: text })}
+            editable={editing}
           />
-        </View>
 
-        <View style={styles.row}>
-          <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Age</Text>
-            <TextInput
-              style={styles.input}
-              value={profile.age}
-              onChangeText={(text) => setProfile({...profile, age: text})}
-              placeholder="Age"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="number-pad"
-            />
-          </View>
-          <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Gender</Text>
-            <TextInput
-              style={styles.input}
-              value={profile.gender}
-              onChangeText={(text) => setProfile({...profile, gender: text})}
-              placeholder="male/female/other"
-              placeholderTextColor="#9CA3AF"
-            />
-          </View>
-        </View>
+          <Text style={styles.label}>Weight (kg)</Text>
+          <TextInput
+            style={[styles.input, !editing && styles.inputDisabled]}
+            value={formData.weight}
+            onChangeText={(text) => setFormData({ ...formData, weight: text })}
+            keyboardType="numeric"
+            placeholder="Enter your weight"
+            editable={editing}
+          />
 
-        <View style={styles.row}>
-          <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Weight (kg)</Text>
-            <TextInput
-              style={styles.input}
-              value={profile.weight}
-              onChangeText={(text) => setProfile({...profile, weight: text})}
-              placeholder="Weight"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="decimal-pad"
-            />
-          </View>
-          <View style={[styles.inputGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Height (cm)</Text>
-            <TextInput
-              style={styles.input}
-              value={profile.height}
-              onChangeText={(text) => setProfile({...profile, height: text})}
-              placeholder="Height"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="decimal-pad"
-            />
-          </View>
-        </View>
+          <Text style={styles.label}>Height (cm)</Text>
+          <TextInput
+            style={[styles.input, !editing && styles.inputDisabled]}
+            value={formData.height}
+            onChangeText={(text) => setFormData({ ...formData, height: text })}
+            keyboardType="numeric"
+            placeholder="Enter your height"
+            editable={editing}
+          />
 
-        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Age</Text>
+          <TextInput
+            style={[styles.input, !editing && styles.inputDisabled]}
+            value={formData.age}
+            onChangeText={(text) => setFormData({ ...formData, age: text })}
+            keyboardType="numeric"
+            placeholder="Enter your age"
+            editable={editing}
+          />
+
           <Text style={styles.label}>Fitness Goal</Text>
           <TextInput
-            style={styles.input}
-            value={profile.fitnessGoal}
-            onChangeText={(text) => setProfile({...profile, fitnessGoal: text})}
-            placeholder="e.g., lose_weight, build_muscle, stay_active"
-            placeholderTextColor="#9CA3AF"
+            style={[styles.input, !editing && styles.inputDisabled]}
+            value={formData.fitnessGoal}
+            onChangeText={(text) => setFormData({ ...formData, fitnessGoal: text })}
+            placeholder="e.g., Lose weight, Build muscle"
+            editable={editing}
           />
         </View>
+
+        {editing && (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={handleCancel}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.saveButton, loading && styles.buttonDisabled]}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.saveButtonText}>Save</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
-      <TouchableOpacity
-        style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
-        onPress={handleSave}
-        disabled={saving}
-      >
-        <Text style={styles.saveBtnText}>
-          {saving ? 'Saving...' : 'Save Changes'}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.logoutBtn}
-        onPress={handleLogout}
-      >
-        <Text style={styles.logoutBtnText}>Logout</Text>
-      </TouchableOpacity>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Account</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -225,99 +182,114 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6'
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: '#f5f5f5',
   },
   header: {
-    alignItems: 'center',
-    paddingVertical: 24,
+    padding: 30,
     backgroundColor: '#fff',
-    marginBottom: 16
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  avatar: {
+  avatarContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#007AFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12
+    marginBottom: 15,
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 36,
+    fontWeight: 'bold',
     color: '#fff',
-    fontWeight: 'bold'
   },
   email: {
-    color: '#6B7280',
-    fontSize: 14
+    fontSize: 16,
+    color: '#666',
   },
   section: {
+    marginTop: 20,
     backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 16
+    padding: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 16
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  inputGroup: {
-    marginBottom: 16
+  editButton: {
+    color: '#007AFF',
+    fontSize: 16,
   },
-  row: {
-    flexDirection: 'row',
-    gap: 12
-  },
-  halfWidth: {
-    flex: 1
+  form: {
+    marginBottom: 10,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 6
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+    marginTop: 15,
   },
   input: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
     padding: 12,
+    borderRadius: 8,
     fontSize: 16,
-    color: '#1F2937'
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
-  saveBtn: {
-    backgroundColor: '#4F46E5',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center'
+  inputDisabled: {
+    backgroundColor: '#f5f5f5',
+    color: '#666',
   },
-  saveBtnDisabled: {
-    opacity: 0.7
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
-  saveBtnText: {
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+  },
+  saveButton: {
+    backgroundColor: '#007AFF',
+  },
+  buttonDisabled: {
+    backgroundColor: '#999',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  saveButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
   },
-  logoutBtn: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 40,
-    borderRadius: 12,
-    padding: 16,
+  logoutButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EF4444'
   },
-  logoutBtnText: {
-    color: '#EF4444',
+  logoutButtonText: {
+    color: '#fff',
     fontSize: 16,
-    fontWeight: '600'
-  }
+    fontWeight: '600',
+  },
 });

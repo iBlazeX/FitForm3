@@ -100,10 +100,15 @@ npm start
 ```bash
 cd mobile-app
 npm install
-# Edit src/config/firebase.js with your Firebase web config
+# Copy and configure environment variables
+cp .env.example .env
+# Edit .env with your Firebase config and API URLs
+# IMPORTANT: For physical devices, replace localhost with your computer's IP address
 npm start
 # Scan QR code with Expo Go app or press 'a' for Android, 'i' for iOS
 ```
+
+**Note**: See [mobile-app/README.md](mobile-app/README.md) for detailed setup instructions, especially regarding network configuration for physical devices.
 
 ## 📁 Project Structure
 
@@ -300,17 +305,25 @@ REACT_APP_CV_SERVICE_URL=http://localhost:5000/api
 # Add Firebase web config if using direct Firebase connection
 ```
 
-### Mobile App (src/config/firebase.js)
-```javascript
-export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+### Mobile App (.env)
+```bash
+# API Configuration (use your computer's IP for physical devices)
+API_URL=http://YOUR_IP_ADDRESS:3000/api
+CV_SERVICE_URL=http://YOUR_IP_ADDRESS:5000/api
+
+# Firebase Configuration (from Firebase Console)
+FIREBASE_API_KEY=YOUR_API_KEY
+FIREBASE_AUTH_DOMAIN=YOUR_PROJECT_ID.firebaseapp.com
+FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+FIREBASE_STORAGE_BUCKET=YOUR_PROJECT_ID.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=YOUR_MESSAGING_SENDER_ID
+FIREBASE_APP_ID=YOUR_APP_ID
 ```
+
+**Important for Mobile App**: 
+- Use your computer's local IP address (e.g., `192.168.1.100`) instead of `localhost` when testing on physical devices
+- For Android Emulator, use `10.0.2.2` instead of `localhost`
+- See [mobile-app/README.md](mobile-app/README.md) for detailed setup instructions
 
 ## 🧪 Testing
 

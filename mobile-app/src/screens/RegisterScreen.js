@@ -15,9 +15,7 @@ import {
   ActivityIndicator,
   ScrollView
 } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -25,6 +23,7 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
 
   const handleRegister = async () => {
     if (!username || !email || !password || !confirmPassword) {
@@ -44,109 +43,86 @@ export default function RegisterScreen({ navigation }) {
 
     setLoading(true);
     try {
-      // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Create user profile in Firestore
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        username,
-        email,
-        profile: {
-          age: null,
-          weight: null,
-          height: null,
-          gender: null,
-          fitnessGoal: null
-        },
-        createdAt: new Date().toISOString()
-      });
+      await register(email, password, username);
+      Alert.alert('Success', 'Account created successfully!');
+      // Navigation is handled by auth state change
     } catch (error) {
-      let message = 'Registration failed. Please try again.';
-      if (error.code === 'auth/email-already-in-use') {
-        message = 'This email is already registered.';
-      } else if (error.code === 'auth/invalid-email') {
-        message = 'Invalid email address.';
-      } else if (error.code === 'auth/weak-password') {
-        message = 'Password is too weak.';
-      }
-      Alert.alert('Registration Error', message);
+      console.error('Registration error:', error);
+      Alert.alert('Error', error.message || 'Failed to register');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.logo}>💪 FitForm</Text>
-          <Text style={styles.subtitle}>AI-Powered Fitness</Text>
-        </View>
-
-        <View style={styles.form}>
+        <View style={styles.content}>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.description}>Start your fitness journey today</Text>
+          <Text style={styles.subtitle}>Join FitForm Today</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            placeholderTextColor="#9CA3AF"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
+          <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="#9CA3AF"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#9CA3AF"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            placeholderTextColor="#9CA3AF"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Create Account</Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Register</Text>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.linkText}>
-              Already have an account? <Text style={styles.linkBold}>Sign in</Text>
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Login')}
+              style={styles.linkButton}
+            >
+              <Text style={styles.linkText}>
+                Already have an account? Login
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -156,74 +132,61 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
-    flexGrow: 1
+    flexGrow: 1,
   },
-  header: {
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 30
-  },
-  logo: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#4F46E5'
-  },
-  subtitle: {
-    color: '#6B7280',
-    marginTop: 5
-  },
-  form: {
+  content: {
     flex: 1,
-    paddingHorizontal: 24
+    justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#1F2937',
-    textAlign: 'center'
-  },
-  description: {
-    color: '#6B7280',
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 32
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 40,
+  },
+  form: {
+    width: '100%',
   },
   input: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
     fontSize: 16,
-    marginBottom: 16,
-    color: '#1F2937'
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   button: {
-    backgroundColor: '#4F46E5',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8
+    marginTop: 10,
   },
   buttonDisabled: {
-    opacity: 0.7
+    backgroundColor: '#999',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   linkButton: {
-    marginTop: 24,
-    marginBottom: 40,
-    alignItems: 'center'
+    marginTop: 20,
+    alignItems: 'center',
   },
   linkText: {
-    color: '#6B7280'
+    color: '#007AFF',
+    fontSize: 14,
   },
-  linkBold: {
-    color: '#4F46E5',
-    fontWeight: '600'
-  }
 });
