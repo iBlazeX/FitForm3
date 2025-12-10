@@ -116,7 +116,8 @@ mobile-app/
 
 ## Available Scripts
 
-- `npm start` - Start Expo development server
+- `npm start` - Start Expo development server (with offline mode enabled)
+- `npm run start:online` - Start Expo development server (online mode, requires internet)
 - `npm run android` - Run on Android emulator/device
 - `npm run ios` - Run on iOS simulator/device
 - `npm run web` - Run in web browser
@@ -182,6 +183,28 @@ To enable camera features in the future:
 - The app will request camera access when needed
 
 ## Troubleshooting
+
+### "TypeError: fetch failed" when starting Metro Bundler
+
+**Problem**: Expo CLI fails to start with a fetch error when trying to validate dependencies
+
+**Solution**:
+This happens when Expo tries to fetch native module versions from its API servers but cannot reach them (e.g., in offline environments or behind restrictive firewalls).
+
+The app is now configured to run in offline mode by default:
+- The `npm start` command includes the `--offline` flag
+- The `.env` file sets `EXPO_OFFLINE=1`
+- Metro bundler is configured to work without internet connectivity
+
+If you have internet access and want to use online mode:
+```bash
+npm run start:online
+```
+
+Or manually set in `.env`:
+```bash
+EXPO_OFFLINE=0
+```
 
 ### "Network request failed"
 
