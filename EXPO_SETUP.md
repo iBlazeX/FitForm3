@@ -222,6 +222,25 @@ expo build:ios
 
 ## Common Issues
 
+### Property 'require' doesn't exist (Metro Bundler)
+
+**Problem**: Metro bundler fails with error "Property 'require' doesn't exist" when running on Expo Go
+
+**Cause**: The `metro.config.js` file is using an incorrect import path for Expo's Metro configuration. In Expo SDK 50+, the correct package is `expo/metro-config`, not `@expo/metro-config` directly.
+
+**Solution**:
+Ensure your `metro.config.js` uses the correct import:
+```javascript
+const { getDefaultConfig } = require('expo/metro-config');
+```
+
+If you're still seeing this error:
+1. Clear Metro bundler cache: `npm start -- --clear`
+2. Reinstall dependencies: `rm -rf node_modules && npm install`
+3. Restart Metro: `npm start`
+
+**Related**: Make sure `newArchEnabled: false` is set in `app.json` for compatibility with Expo Go.
+
 ### TypeError: fetch failed (Metro Bundler)
 
 **Problem**: Metro bundler fails to start with a fetch error
