@@ -4,6 +4,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PORT=5000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -34,10 +35,11 @@ WORKDIR /app/src
 # Expose port
 EXPOSE 5000
 
-# Health check
+# Health check - use environment variable PORT
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
-# Run with gunicorn - single worker to maintain session state in memory
+# Run with gunicorn - use PORT environment variable
+# Single worker to maintain session state in memory
 # For production with multiple workers, use Redis for session storage
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "--timeout", "120", "app:app"]
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 120 app:app
