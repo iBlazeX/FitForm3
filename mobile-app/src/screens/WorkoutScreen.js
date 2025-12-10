@@ -11,7 +11,6 @@ import {
   ScrollView,
   Alert
 } from 'react-native';
-import { Camera } from 'expo-camera';
 
 export default function WorkoutScreen() {
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -24,15 +23,11 @@ export default function WorkoutScreen() {
   ];
 
   const requestCameraPermission = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
-    
-    if (status !== 'granted') {
-      Alert.alert(
-        'Camera Permission Required',
-        'FitForm needs camera access to detect your exercises. Please enable it in your device settings.'
-      );
-    }
+    // Camera functionality will be implemented in future update
+    Alert.alert(
+      'Camera Feature Coming Soon',
+      'Camera-based exercise detection will be available in the next update.'
+    );
   };
 
   const handleExerciseSelect = async (exercise) => {

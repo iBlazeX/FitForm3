@@ -6,7 +6,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
 
@@ -80,14 +80,9 @@ function MainTabs() {
 // Simple tab icon component
 function TabIcon({ icon, color }) {
   return (
-    <View style={styles.tabIcon}>
-      <View style={{ opacity: color === '#007AFF' ? 1 : 0.6 }}>
-        {/* Using emoji as icon - in production, use icon library */}
-        <View style={styles.iconText}>
-          {typeof icon === 'string' && <View style={{ fontSize: 24 }}>{icon}</View>}
-        </View>
-      </View>
-    </View>
+    <Text style={[styles.tabIcon, { opacity: color === '#007AFF' ? 1 : 0.6 }]}>
+      {icon}
+    </Text>
   );
 }
 
@@ -132,12 +127,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   tabIcon: {
-    width: 28,
-    height: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconText: {
     fontSize: 24,
   },
 });
