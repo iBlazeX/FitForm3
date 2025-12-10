@@ -3,7 +3,7 @@
  * This file replaces app.json and allows us to use environment variables
  */
 
-export default {
+module.exports = {
   expo: {
     name: 'FitForm',
     slug: 'fitform',
